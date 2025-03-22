@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
   Home, 
-  Search, 
   ChefHat, 
   ShoppingCart, 
   User, 
@@ -39,7 +38,6 @@ const Navbar = () => {
 
   const navItems = [
     { name: 'Home', path: '/dashboard', icon: <Home className="w-5 h-5" /> },
-    { name: 'Discover', path: '/discover', icon: <Search className="w-5 h-5" /> },
     { name: 'Recipes', path: '/recipes', icon: <ChefHat className="w-5 h-5" /> },
     { name: 'Scan', path: '/grocery-recognition', icon: <Camera className="w-5 h-5" /> },
     { name: 'Cart', path: '/cart', icon: <ShoppingCart className="w-5 h-5" /> },
