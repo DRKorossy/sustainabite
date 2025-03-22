@@ -1,0 +1,42 @@
+
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g clip-path="url(#clip0_1_2)">
+    <!-- Table surface -->
+    <rect x="0" y="200" width="400" height="100" fill="#D87D56" />
+    
+    <!-- Plate -->
+    <circle cx="200" cy="180" r="80" fill="#FFF1E6" stroke="#E0D8D0" stroke-width="2" />
+    
+    <!-- Vegetables on plate -->
+    <circle cx="180" cy="160" r="15" fill="#A0C55F" /> <!-- Lettuce -->
+    <circle cx="210" cy="150" r="12" fill="#D64545" /> <!-- Tomato -->
+    <circle cx="235" cy="170" r="10" fill="#F3C75F" /> <!-- Corn -->
+    <circle cx="165" cy="185" r="8" fill="#9B6A79" /> <!-- Red onion -->
+    
+    <!-- Protein on plate -->
+    <rect x="170" y="190" width="60" height="25" rx="5" fill="#E6A16F" /> <!-- Protein -->
+    
+    <!-- Utensils -->
+    <rect x="260" y="160" width="5" height="60" rx="2" fill="#C4C4C4" transform="rotate(30 260 160)" /> <!-- Fork handle -->
+    <rect x="140" y="160" width="5" height="60" rx="2" fill="#C4C4C4" transform="rotate(-30 140 160)" /> <!-- Knife handle -->
+    
+    <!-- Glass -->
+    <rect x="300" y="140" width="30" height="60" rx="5" fill="#C4E8F9" opacity="0.7" />
+    <rect x="300" y="140" width="30" height="60" rx="5" fill="none" stroke="#A0B4C5" stroke-width="1" />
+    
+    <!-- Bowl -->
+    <ellipse cx="100" cy="160" rx="40" ry="20" fill="#FFF1E6" />
+    <path d="M60 160 Q100 185 140 160" stroke="#E0D8D0" stroke-width="2" fill="none" />
+    <!-- Bowl contents -->
+    <ellipse cx="100" cy="160" rx="30" ry="15" fill="#F9D9A7" /> <!-- Rice or grain -->
+    
+    <!-- Leaves decoration -->
+    <path d="M300 80 Q320 60 340 80 Q350 90 340 100 Q320 120 300 100 Q290 90 300 80Z" fill="#A0C55F" opacity="0.9" />
+    <path d="M320 70 Q340 50 360 70 Q370 80 360 90 Q340 110 320 90 Q310 80 320 70Z" fill="#7CAA2D" opacity="0.8" />
+  </g>
+  <defs>
+    <clipPath id="clip0_1_2">
+      <rect width="400" height="300" fill="white" />
+    </clipPath>
+  </defs>
+</svg>
