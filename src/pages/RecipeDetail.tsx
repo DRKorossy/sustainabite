@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ChefHat, 
   Clock, 
-  Fire, 
+  Flame, 
   Star, 
   Users, 
   ShoppingCart,
@@ -20,7 +19,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 
-// Mock recipe data - in a real app, this would come from an API
 const recipeData = {
   id: '1',
   title: 'Avocado & Egg Toast',
@@ -85,7 +83,6 @@ const RecipeDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // Simulate loading data
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -134,7 +131,6 @@ const RecipeDetail = () => {
         </div>
       ) : (
         <>
-          {/* Hero image */}
           <div className="relative h-72 sm:h-80 md:h-96 overflow-hidden">
             <img 
               src={recipe.image} 
@@ -178,7 +174,6 @@ const RecipeDetail = () => {
             </div>
           </div>
           
-          {/* Recipe header */}
           <div className="px-6 py-4 -mt-10 relative">
             <div className="glass-card rounded-2xl p-6 shadow-lg">
               <h1 className="text-2xl font-serif font-semibold mb-2">{recipe.title}</h1>
@@ -190,7 +185,7 @@ const RecipeDetail = () => {
                 </div>
                 
                 <div className="flex items-center gap-1 text-sm bg-muted rounded-full px-3 py-1">
-                  <Fire className="w-4 h-4" />
+                  <Flame className="w-4 h-4" />
                   <span>{recipe.calories} cal</span>
                 </div>
                 
@@ -209,7 +204,6 @@ const RecipeDetail = () => {
             </div>
           </div>
           
-          {/* Recipe content */}
           <div className="px-6 py-4">
             <Tabs defaultValue="ingredients" className="w-full">
               <TabsList className="w-full mb-4 h-auto bg-muted rounded-xl p-1">
@@ -328,7 +322,6 @@ const RecipeDetail = () => {
             </Tabs>
           </div>
           
-          {/* Reviews section */}
           <div className="px-6 py-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-serif font-medium">Reviews</h2>

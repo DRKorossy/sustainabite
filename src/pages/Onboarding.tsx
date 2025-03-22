@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   X, 
   Clock, 
-  Fire, 
+  Flame, 
   ChefHat, 
   ArrowRight,
   ArrowLeft
@@ -150,7 +149,7 @@ const Onboarding = () => {
             
             <div className="w-full max-w-sm mx-auto">
               <div className="relative">
-                <Fire className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Flame className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="number"
                   value={calorieGoal}
@@ -194,12 +193,10 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen relative bg-sustainabite-cream overflow-hidden">
-      {/* Background decorations */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-sustainabite-orange/10 rounded-full -translate-y-1/3 translate-x-1/3 blur-3xl" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-sustainabite-purple/10 rounded-full translate-y-1/3 -translate-x-1/3 blur-3xl" />
       
       <div className="container max-w-md mx-auto px-6 py-8">
-        {/* Logo */}
         <div className="flex justify-center items-center mb-8">
           <div className="relative">
             <h1 className="text-3xl font-serif font-bold text-sustainabite-orange">
@@ -214,12 +211,10 @@ const Onboarding = () => {
           </div>
         </div>
         
-        {/* Step content */}
         <div className="glass-card rounded-2xl p-6 mb-8">
           {renderStep()}
         </div>
         
-        {/* Navigation */}
         <div className="flex justify-between">
           {step > 1 ? (
             <Button 
@@ -252,7 +247,6 @@ const Onboarding = () => {
           </Button>
         </div>
         
-        {/* Step indicator */}
         <div className="flex justify-center mt-8">
           {[1, 2, 3, 4].map((i) => (
             <div 

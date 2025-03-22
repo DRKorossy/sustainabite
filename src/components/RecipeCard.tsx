@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Fire, ChefHat, Star } from 'lucide-react';
+import { Clock, Flame, ChefHat, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RecipeCardProps {
@@ -75,7 +74,7 @@ const RecipeCard = ({
           </div>
           
           <div className="flex items-center gap-1 text-xs bg-muted rounded-full px-2 py-1">
-            <Fire className="w-3 h-3" />
+            <Flame className="w-3 h-3" />
             <span>{calories} cal</span>
           </div>
           

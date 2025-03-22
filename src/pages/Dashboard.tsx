@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -6,7 +5,7 @@ import {
   Filter, 
   ChefHat, 
   Clock, 
-  Fire, 
+  Flame, 
   Utensils, 
   ArrowRight
 } from 'lucide-react';
@@ -86,7 +85,7 @@ const categories = [
   { id: 'all', name: 'All', icon: <Utensils className="w-4 h-4" /> },
   { id: 'breakfast', name: 'Breakfast', icon: <ChefHat className="w-4 h-4" /> },
   { id: 'lunch', name: 'Lunch', icon: <Clock className="w-4 h-4" /> }, 
-  { id: 'dinner', name: 'Dinner', icon: <Fire className="w-4 h-4" /> }
+  { id: 'dinner', name: 'Dinner', icon: <Flame className="w-4 h-4" /> }
 ];
 
 const Dashboard = () => {
