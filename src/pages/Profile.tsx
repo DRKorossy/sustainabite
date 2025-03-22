@@ -11,13 +11,16 @@ import {
   Award, 
   MessageCircle, 
   HelpCircle, 
-  User
+  User,
+  ChevronLeft,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Mock user data
 const userData = {
@@ -63,6 +66,15 @@ const profileSections = [
 const Profile = () => {
   return (
     <div className="min-h-screen bg-sustainabite-cream pb-24">
+      {/* Swipe indicator */}
+      <div className="fixed top-3 left-0 right-0 z-10 flex justify-center pointer-events-none opacity-30">
+        <div className="flex items-center space-x-2 bg-black/10 backdrop-blur-sm px-3 py-1 rounded-full">
+          <ChevronLeft className="w-4 h-4" />
+          <span className="text-xs font-medium">Swipe to navigate</span>
+          <ChevronRight className="w-4 h-4" />
+        </div>
+      </div>
+      
       {/* Profile header */}
       <div className="px-6 py-8">
         <div className="flex items-center gap-4">

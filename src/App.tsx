@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import GroceryRecognition from "./pages/GroceryRecognition";
+import SwipeNavigation from "./components/SwipeNavigation";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SwipeNavigation />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/onboarding" element={<Onboarding />} />
