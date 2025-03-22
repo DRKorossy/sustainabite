@@ -14,6 +14,7 @@ import RecipeDetail from "./pages/RecipeDetail";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
+import GroceryRecognition from "./pages/GroceryRecognition";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/cart" element={<Cart />} />
           <Route path="/recipe/:id" element={<RecipeDetail />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/grocery-recognition" element={<GroceryRecognition />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

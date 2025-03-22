@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -7,7 +8,8 @@ import {
   Clock, 
   Flame, 
   Utensils, 
-  ArrowRight
+  ArrowRight,
+  Camera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RecipeCard from '@/components/RecipeCard';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Mock data for recipes
 const mockRecipes = [
@@ -94,6 +97,7 @@ const Dashboard = () => {
   const [filteredRecipes, setFilteredRecipes] = useState(mockRecipes);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     // Simulate loading data
@@ -118,7 +122,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-sustainabite-cream pb-24">
       {/* Header */}
-      <header className="bg-sustainabite-cream glass-card sticky top-0 z-30 py-4 px-6 shadow-sm">
+      <header className="bg-sustainabite-cream glass-card sticky top-0 z-30 py-4 px-4 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <h1 className="text-2xl font-serif font-semibold mr-2">
@@ -134,6 +138,14 @@ const Dashboard = () => {
           </div>
           
           <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="rounded-full border-sustainabite-purple/30 text-sustainabite-purple hover:bg-sustainabite-purple/5"
+              onClick={() => navigate('/grocery-recognition')}
+            >
+              <Camera className="w-4 h-4" />
+            </Button>
             <Button 
               variant="outline" 
               size="icon" 
@@ -157,17 +169,17 @@ const Dashboard = () => {
         </div>
       </header>
       
-      <main className="px-6 py-4">
-        {/* Category filters */}
-        <ScrollArea className="w-full whitespace-nowrap pb-2">
-          <div className="flex gap-2 w-max">
+      <main className="px-4 py-4">
+        {/* Category filters - Make this scrollable for mobile */}
+        <ScrollArea className="w-full pb-2">
+          <div className="flex gap-2 w-max pr-4">
             {categories.map((category) => (
               <Button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 variant="outline"
                 className={cn(
-                  "rounded-full flex gap-2 py-5 border-sustainabite-purple/30 transition-all",
+                  "rounded-full flex gap-2 py-2 border-sustainabite-purple/30 transition-all whitespace-nowrap",
                   activeCategory === category.id 
                     ? "bg-sustainabite-purple text-white" 
                     : "text-sustainabite-purple hover:bg-sustainabite-purple/5"
@@ -181,24 +193,24 @@ const Dashboard = () => {
         </ScrollArea>
         
         {/* Personalized section */}
-        <div className="mt-8 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-serif font-medium">Personalized for you</h2>
+        <div className="mt-6 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-serif font-medium">Personalized for you</h2>
             <Button 
               variant="link" 
-              className="text-sustainabite-purple font-medium p-0"
+              className="text-sustainabite-purple font-medium p-0 text-sm"
               onClick={() => navigate('/discover')}
             >
               See all
-              <ArrowRight className="ml-1 w-4 h-4" />
+              <ArrowRight className="ml-1 w-3 h-3" />
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {isLoading ? (
               <>
-                <div className="h-64 rounded-2xl animate-pulse bg-muted"></div>
-                <div className="h-64 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
               </>
             ) : (
               filteredRecipes.slice(0, 2).map(recipe => (
@@ -218,26 +230,26 @@ const Dashboard = () => {
         </div>
         
         {/* Today's meals */}
-        <div className="mt-10">
-          <h2 className="text-xl font-serif font-medium mb-4">Today's meals</h2>
+        <div className="mt-8">
+          <h2 className="text-lg font-serif font-medium mb-3">Today's meals</h2>
           
           <Tabs defaultValue="breakfast" className="w-full">
-            <TabsList className="w-full mb-4 h-auto bg-muted rounded-xl p-1">
+            <TabsList className="w-full mb-3 h-auto bg-muted rounded-xl p-1">
               <TabsTrigger 
                 value="breakfast" 
-                className="flex-1 py-2 data-[state=active]:bg-white data-[state=active]:text-sustainabite-purple rounded-lg"
+                className="flex-1 py-1.5 data-[state=active]:bg-white data-[state=active]:text-sustainabite-purple rounded-lg text-xs"
               >
                 Breakfast
               </TabsTrigger>
               <TabsTrigger 
                 value="lunch" 
-                className="flex-1 py-2 data-[state=active]:bg-white data-[state=active]:text-sustainabite-purple rounded-lg"
+                className="flex-1 py-1.5 data-[state=active]:bg-white data-[state=active]:text-sustainabite-purple rounded-lg text-xs"
               >
                 Lunch
               </TabsTrigger>
               <TabsTrigger 
                 value="dinner" 
-                className="flex-1 py-2 data-[state=active]:bg-white data-[state=active]:text-sustainabite-purple rounded-lg"
+                className="flex-1 py-1.5 data-[state=active]:bg-white data-[state=active]:text-sustainabite-purple rounded-lg text-xs"
               >
                 Dinner
               </TabsTrigger>
@@ -245,7 +257,7 @@ const Dashboard = () => {
             
             <TabsContent value="breakfast" className="pt-2">
               {isLoading ? (
-                <div className="h-64 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
               ) : (
                 <RecipeCard
                   {...mockRecipes.find(r => r.category === 'breakfast') || mockRecipes[0]}
@@ -255,7 +267,7 @@ const Dashboard = () => {
             
             <TabsContent value="lunch" className="pt-2">
               {isLoading ? (
-                <div className="h-64 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
               ) : (
                 <RecipeCard
                   {...mockRecipes.find(r => r.category === 'lunch') || mockRecipes[1]}
@@ -265,7 +277,7 @@ const Dashboard = () => {
             
             <TabsContent value="dinner" className="pt-2">
               {isLoading ? (
-                <div className="h-64 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
               ) : (
                 <RecipeCard
                   {...mockRecipes.find(r => r.category === 'dinner') || mockRecipes[2]}
@@ -276,24 +288,24 @@ const Dashboard = () => {
         </div>
         
         {/* Recent recipes */}
-        <div className="mt-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-serif font-medium">Recent recipes</h2>
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-serif font-medium">Recent recipes</h2>
             <Button 
               variant="link" 
-              className="text-sustainabite-purple font-medium p-0"
+              className="text-sustainabite-purple font-medium p-0 text-sm"
               onClick={() => navigate('/recipes')}
             >
               View all
-              <ArrowRight className="ml-1 w-4 h-4" />
+              <ArrowRight className="ml-1 w-3 h-3" />
             </Button>
           </div>
           
           <div className="grid grid-cols-2 gap-3">
             {isLoading ? (
               <>
-                <div className="h-40 rounded-2xl animate-pulse bg-muted"></div>
-                <div className="h-40 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-36 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-36 rounded-2xl animate-pulse bg-muted"></div>
               </>
             ) : (
               filteredRecipes.slice(2, 4).map(recipe => (
