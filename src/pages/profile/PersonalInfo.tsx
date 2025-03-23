@@ -80,7 +80,7 @@ const PersonalInfo = () => {
         cooking_level: cookingLevel,
         cooking_time: cookingTime ? Number(cookingTime) : null,
         calories: calories ? Number(calories) : null,
-        updated_at: new Date()
+        updated_at: new Date().toISOString()
       };
       
       const { error } = await supabase

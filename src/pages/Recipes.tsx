@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -87,13 +86,11 @@ const Recipes = () => {
     try {
       if (!user) return;
       
-      const { data, error } = await searchRecipes({
+      const { data } = await searchRecipes({
         searchTerm: '',
         limit: 10,
         offset: 0
       });
-      
-      if (error) throw error;
       
       // For now, just show a subset as user's created recipes
       setCreatedRecipes(data?.slice(0, 3) || []);

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Settings, 
   LogOut, 
@@ -13,14 +14,17 @@ import {
   HelpCircle, 
   User,
   ChevronLeft,
-  ChevronDown
+  ChevronDown,
+  Target
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 // Mock user data
 const userData = {
@@ -41,6 +45,7 @@ const profileSections = [
     title: 'Account',
     items: [
       { icon: <User className="w-5 h-5" />, label: 'Personal Information', link: '/profile/personal' },
+      { icon: <Target className="w-5 h-5" />, label: 'Goals', link: '/profile/goals' },
       { icon: <Bell className="w-5 h-5" />, label: 'Notifications', link: '/profile/notifications', rightElement: <Switch id="notifications" defaultChecked /> },
       { icon: <CreditCard className="w-5 h-5" />, label: 'Subscription', link: '/profile/subscription', rightElement: <Badge className="bg-amber-500">Gold</Badge> }
     ]
@@ -64,6 +69,30 @@ const profileSections = [
 ];
 
 const Profile = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      if (signOut) {
+        await signOut();
+      }
+      toast({
+        title: 'Logged out',
+        description: 'You have been successfully logged out.',
+      });
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: 'Error logging out',
+        description: 'There was a problem logging you out.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-sustainabite-cream pb-24">
       {/* Swipe indicator */}
@@ -80,8 +109,8 @@ const Profile = () => {
         <div className="flex items-center gap-4">
           <div className="relative">
             <img 
-              src={userData.avatar} 
-              alt={userData.name} 
+              src={user?.user_metadata?.avatar_url || userData.avatar} 
+              alt={user?.user_metadata?.full_name || userData.name} 
               className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-md"
             />
             <div className="absolute -bottom-1 -right-1 bg-sustainabite-orange text-white text-xs font-medium py-0.5 px-2 rounded-full">
@@ -90,8 +119,10 @@ const Profile = () => {
           </div>
           
           <div>
-            <h1 className="text-2xl font-serif font-medium">{userData.name}</h1>
-            <p className="text-muted-foreground">{userData.email}</p>
+            <h1 className="text-2xl font-serif font-medium">
+              {user?.user_metadata?.full_name || user?.email?.split('@')[0] || userData.name}
+            </h1>
+            <p className="text-muted-foreground">{user?.email || userData.email}</p>
           </div>
         </div>
       </div>
@@ -137,6 +168,7 @@ const Profile = () => {
             variant="outline" 
             className="w-full mt-4 rounded-xl border border-sustainabite-purple/30 text-sustainabite-purple hover:bg-sustainabite-purple/5"
             size="sm"
+            onClick={() => navigate('/profile/personal')}
           >
             Edit Preferences
           </Button>
@@ -181,6 +213,7 @@ const Profile = () => {
         <Button 
           variant="outline" 
           className="w-full py-6 rounded-xl border border-destructive/30 text-destructive hover:bg-destructive/5"
+          onClick={handleLogout}
         >
           <LogOut className="mr-2 w-5 h-5" />
           Log out

@@ -24,6 +24,7 @@ import Friends from "./pages/Friends";
 import Achievements from "./pages/Achievements";
 import PersonalInfo from "./pages/profile/PersonalInfo";
 import CookingHistory from "./pages/profile/CookingHistory";
+import Goals from "./pages/profile/Goals";
 import SavedRecipes from "./pages/profile/SavedRecipes";
 import Notifications from "./pages/profile/Notifications";
 import Subscription from "./pages/profile/Subscription";
@@ -59,6 +60,7 @@ const App = () => (
             
             {/* Profile subsections */}
             <Route path="/profile/personal" element={<PersonalInfo />} />
+            <Route path="/profile/goals" element={<Goals />} />
             <Route path="/profile/notifications" element={<Notifications />} />
             <Route path="/profile/subscription" element={<Subscription />} />
             <Route path="/profile/saved" element={<SavedRecipes />} />
