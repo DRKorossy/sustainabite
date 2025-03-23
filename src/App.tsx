@@ -15,32 +15,43 @@ import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import GroceryRecognition from "./pages/GroceryRecognition";
 import SwipeNavigation from "./components/SwipeNavigation";
+import { AuthProvider } from "./context/AuthContext";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import SocialFeed from "./pages/SocialFeed";
+import MyGroceries from "./pages/MyGroceries";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <SwipeNavigation />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/recipes" element={<Recipes />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/recipe/:id" element={<RecipeDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/grocery-recognition" element={<GroceryRecognition />} />
-          {/* Redirect old discover path to recipes */}
-          <Route path="/discover" element={<Navigate to="/recipes" replace />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Navbar />
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <SwipeNavigation />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/recipes" element={<Recipes />} />
+            <Route path="/my-groceries" element={<MyGroceries />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/recipe/:id" element={<RecipeDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/grocery-recognition" element={<GroceryRecognition />} />
+            <Route path="/social" element={<SocialFeed />} />
+            {/* Redirect old discover path to recipes */}
+            <Route path="/discover" element={<Navigate to="/recipes" replace />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Navbar />
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

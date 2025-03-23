@@ -6,6 +6,7 @@ import {
   ChefHat, 
   ShoppingCart, 
   User, 
+  Carrot,
   Camera
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -39,13 +40,14 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/dashboard', icon: <Home className="w-5 h-5" /> },
     { name: 'Recipes', path: '/recipes', icon: <ChefHat className="w-5 h-5" /> },
-    { name: 'Scan', path: '/grocery-recognition', icon: <Camera className="w-5 h-5" /> },
+    { name: 'Groceries', path: '/my-groceries', icon: <Carrot className="w-5 h-5" /> },
     { name: 'Cart', path: '/cart', icon: <ShoppingCart className="w-5 h-5" /> },
     { name: 'Profile', path: '/profile', icon: <User className="w-5 h-5" /> },
   ];
 
   // Only show navbar on certain pages
-  if (location.pathname === '/' || location.pathname === '/onboarding') {
+  if (location.pathname === '/' || location.pathname === '/onboarding' || 
+      location.pathname === '/login' || location.pathname === '/register') {
     return null;
   }
 

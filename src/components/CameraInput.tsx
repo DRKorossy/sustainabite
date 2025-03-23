@@ -1,13 +1,14 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Camera, X, Upload, Check } from 'lucide-react';
+import { Camera, X, Upload, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from "@/integrations/supabase/client";
 
 interface CameraInputProps {
-  onImageCapture: (imageData: string) => void;
+  onImageCapture: (imageData: string, recognizedItems?: any[]) => void;
   onClose: () => void;
 }
 
@@ -16,6 +17,7 @@ const CameraInput = ({ onImageCapture, onClose }: CameraInputProps) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,13 +79,45 @@ const CameraInput = ({ onImageCapture, onClose }: CameraInputProps) => {
     }
   };
 
-  const confirmImage = () => {
+  const processImage = async () => {
     if (capturedImage) {
-      onImageCapture(capturedImage);
-      toast({
-        title: "Image captured",
-        description: "Processing your groceries...",
-      });
+      setIsProcessing(true);
+      
+      try {
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        // Call the grocery recognition API
+        const response = await supabase.functions.invoke('recognize_grocery', {
+          body: { 
+            image: capturedImage,
+            userId: user?.id
+          }
+        });
+        
+        if (response.error) {
+          throw new Error(response.error.message);
+        }
+        
+        onImageCapture(capturedImage, response.data.recognizedItems);
+        
+        toast({
+          title: "Grocery recognition complete",
+          description: `Recognized ${response.data.recognizedItems.length} items.`,
+        });
+      } catch (error) {
+        console.error('Error processing image:', error);
+        toast({
+          title: "Error processing image",
+          description: "Please try again.",
+          variant: "destructive"
+        });
+        
+        // Still pass the image along even if recognition failed
+        onImageCapture(capturedImage);
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -155,6 +189,15 @@ const CameraInput = ({ onImageCapture, onClose }: CameraInputProps) => {
                 className="w-full h-full object-cover" 
               />
             )}
+            
+            {isProcessing && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <div className="text-center">
+                  <Loader2 className="w-12 h-12 animate-spin mx-auto text-sustainabite-purple" />
+                  <p className="text-white mt-4">Analyzing groceries...</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
         
@@ -197,6 +240,7 @@ const CameraInput = ({ onImageCapture, onClose }: CameraInputProps) => {
                 size="lg"
                 className="rounded-full border-white text-white hover:bg-white/20 p-4"
                 onClick={retakeImage}
+                disabled={isProcessing}
               >
                 <X className="w-6 h-6" />
               </Button>
@@ -204,9 +248,14 @@ const CameraInput = ({ onImageCapture, onClose }: CameraInputProps) => {
               <Button 
                 size="lg"
                 className="rounded-full bg-sustainabite-purple hover:bg-sustainabite-purple/90 p-4"
-                onClick={confirmImage}
+                onClick={processImage}
+                disabled={isProcessing}
               >
-                <Check className="w-6 h-6" />
+                {isProcessing ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <Check className="w-6 h-6" />
+                )}
               </Button>
             </>
           )}
