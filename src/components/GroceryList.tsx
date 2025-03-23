@@ -164,7 +164,7 @@ const GroceryList = () => {
                                   Expired
                                 </Badge>
                               ) : isExpiring ? (
-                                <Badge variant="warning" className="flex items-center bg-amber-500">
+                                <Badge variant="secondary" className="flex items-center bg-amber-500 text-white">
                                   <Clock className="w-3 h-3 mr-1" />
                                   {daysUntilExpiry === 0 ? 'Today' : `${daysUntilExpiry} days`}
                                 </Badge>

@@ -1,80 +1,77 @@
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-interface SwipeOptions {
-  threshold?: number; // minimum distance required for a swipe (px)
-  timeout?: number;   // maximum time allowed for a swipe (ms)
-}
-
-export function useSwipeNavigation(options: SwipeOptions = {}) {
+export const useSwipeNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const [touchStartTime, setTouchStartTime] = useState<number | null>(null);
-  
-  const threshold = options.threshold || 100;
-  const timeout = options.timeout || 300;
-  
-  // Define the main app routes in order for navigation
-  const mainRoutes = [
-    '/dashboard',
-    '/recipes',
-    '/grocery-recognition',
-    '/cart',
-    '/profile'
-  ];
-  
+
+  const isMainPage = (path: string) => {
+    return ['/dashboard', '/recipes', '/my-groceries', '/social', '/cart', '/profile'].includes(path);
+  };
+
+  const handleSwipe = useCallback((direction: 'left' | 'right') => {
+    if (!isMainPage(location.pathname)) return;
+
+    const mainRoutes = ['/dashboard', '/recipes', '/my-groceries', '/social', '/cart', '/profile'];
+    const currentIndex = mainRoutes.indexOf(location.pathname);
+    
+    if (currentIndex === -1) return;
+
+    if (direction === 'left') {
+      // Swipe left to go to the next page (to the right in the array)
+      const nextIndex = (currentIndex + 1) % mainRoutes.length;
+      navigate(mainRoutes[nextIndex]);
+    } else if (direction === 'right') {
+      // Swipe right to go to the previous page (to the left in the array)
+      const prevIndex = (currentIndex - 1 + mainRoutes.length) % mainRoutes.length;
+      navigate(mainRoutes[prevIndex]);
+    }
+  }, [location.pathname, navigate]);
+
   useEffect(() => {
-    const handleTouchStart = (e: TouchEvent) => {
-      setTouchStart(e.targetTouches[0].clientX);
-      setTouchStartTime(Date.now());
+    let touchStartX: number | null = null;
+    let touchEndX: number | null = null;
+    const MIN_SWIPE_DISTANCE = 50;
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      setTouchEnd(e.targetTouches[0].clientX);
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!touchStartX) {
+        return;
+      }
+      touchEndX = e.changedTouches[0].clientX;
+      handleSwipeGesture();
     };
 
-    const handleTouchEnd = () => {
-      if (!touchStart || !touchEnd || !touchStartTime) return;
-      
-      const swipeDistance = touchEnd - touchStart;
-      const swipeTime = Date.now() - touchStartTime;
-      
-      // Only process if swipe is long enough and fast enough
-      if (Math.abs(swipeDistance) > threshold && swipeTime < timeout) {
-        // Check if the current path is one of our main routes
-        const currentIndex = mainRoutes.indexOf(location.pathname);
-        if (currentIndex === -1) return; // Not a main route
-        
-        if (swipeDistance > 0) {
-          // Right swipe - go to previous route
-          if (currentIndex > 0) {
-            navigate(mainRoutes[currentIndex - 1]);
-          }
-        } else {
-          // Left swipe - go to next route
-          if (currentIndex < mainRoutes.length - 1) {
-            navigate(mainRoutes[currentIndex + 1]);
+    const handleSwipeGesture = () => {
+      if (touchStartX && touchEndX) {
+        const distance = touchEndX - touchStartX;
+        if (Math.abs(distance) > MIN_SWIPE_DISTANCE) {
+          if (distance > 0) {
+            handleSwipe('right');
+          } else {
+            handleSwipe('left');
           }
         }
       }
-      
-      // Reset
-      setTouchStart(null);
-      setTouchEnd(null);
-      setTouchStartTime(null);
+      // Reset values
+      touchStartX = null;
+      touchEndX = null;
     };
 
-    document.addEventListener('touchstart', handleTouchStart, { passive: true });
-    document.addEventListener('touchmove', handleTouchMove, { passive: true });
-    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchend', onTouchEnd, { passive: true });
 
     return () => {
-      document.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
     };
-  }, [touchStart, touchEnd, touchStartTime, navigate, location, threshold, timeout, mainRoutes]);
-}
+  }, [handleSwipe]);
+
+  return { handleSwipe };
+};
+
+export default useSwipeNavigation;

@@ -82,15 +82,15 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-sustainabite-cream overflow-hidden relative">
+    <div className="min-h-screen bg-sustainabite-orange overflow-hidden relative">
       <div className="absolute top-0 right-0 w-64 h-64 bg-sustainabite-orange/10 rounded-full -translate-y-1/3 translate-x-1/3 blur-3xl" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-sustainabite-purple/10 rounded-full translate-y-1/3 -translate-x-1/3 blur-3xl" />
       
       <div className="container max-w-md mx-auto px-6 py-12 relative z-10">
         <div className="mb-8 text-center">
           <div className="relative inline-block">
-            <h1 className="text-3xl font-serif font-bold text-sustainabite-orange">
-              Sustaina<span className="text-sustainabite-purple">BITE</span>
+            <h1 className="text-4xl font-serif font-bold text-white">
+              Sustaina<span className="text-white font-bold">BITE</span>
             </h1>
             <div className="absolute -top-3 right-0">
               <svg width="20" height="20" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -99,97 +99,93 @@ const Register = () => {
               </svg>
             </div>
           </div>
-          <p className="text-muted-foreground mt-2">Create your account</p>
+          <p className="text-white mt-2">Sustainable meals. One bite at a time.</p>
+          
+          <div className="mt-6">
+            <img 
+              src="/lovable-uploads/266e3a86-0a6a-4f41-a9c0-56bf724be9d0.png" 
+              alt="Food illustration" 
+              className="w-full h-auto max-w-xs mx-auto"
+            />
+          </div>
         </div>
         
-        <div className="glass-card rounded-2xl p-6">
+        <div className="glass-card rounded-2xl p-6 bg-white/10 backdrop-blur-md">
           <form onSubmit={handleRegister}>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName" className="text-white">Full Name</Label>
                 <Input
                   id="fullName"
                   type="text"
                   placeholder="Your full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="py-6 rounded-xl"
+                  className="py-6 rounded-xl bg-white/20 text-white placeholder:text-white/70 border-white/30"
                   disabled={isLoading}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-white">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="youremail@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="py-6 rounded-xl"
+                  className="py-6 rounded-xl bg-white/20 text-white placeholder:text-white/70 border-white/30"
                   disabled={isLoading}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-white">Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="py-6 rounded-xl"
+                  className="py-6 rounded-xl bg-white/20 text-white border-white/30"
                   disabled={isLoading}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="py-6 rounded-xl"
+                  className="py-6 rounded-xl bg-white/20 text-white border-white/30"
                   disabled={isLoading}
                 />
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full py-6 rounded-xl bg-sustainabite-purple hover:bg-sustainabite-purple/90"
+                className="w-full py-6 rounded-xl bg-sustainabite-purple hover:bg-sustainabite-purple/90 mt-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 ) : (
-                  <UserPlus className="w-5 h-5 mr-2" />
+                  <ArrowRight className="w-5 h-5 mr-2" />
                 )}
-                Create Account
+                Let's Go!
               </Button>
             </div>
           </form>
           
           <div className="mt-4 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-white">
               Already have an account?{' '}
-              <Link to="/login" className="text-sustainabite-purple hover:underline">
+              <Link to="/login" className="text-white hover:underline font-medium">
                 Sign in
               </Link>
             </p>
           </div>
-        </div>
-        
-        <div className="mt-8 text-center">
-          <Button 
-            variant="link" 
-            className="text-muted-foreground" 
-            onClick={() => navigate('/')}
-          >
-            Back to Home
-          </Button>
         </div>
       </div>
     </div>

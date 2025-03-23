@@ -16,10 +16,13 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RecipeCard from '@/components/RecipeCard';
+import RecentRecipesCarousel from '@/components/RecentRecipesCarousel';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
-// Mock data for recipes
+// Mock data for recipes - will be replaced with real data
 const mockRecipes = [
   {
     id: '1',
@@ -70,16 +73,6 @@ const mockRecipes = [
     difficulty: 'Medium' as const,
     rating: 4.4,
     category: 'dinner'
-  },
-  {
-    id: '6',
-    title: 'Chickpea Salad Wrap',
-    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80',
-    cookingTime: 10,
-    calories: 350,
-    difficulty: 'Easy' as const,
-    rating: 4.3,
-    category: 'lunch'
   }
 ];
 
@@ -95,17 +88,13 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [filteredRecipes, setFilteredRecipes] = useState(mockRecipes);
+  const [recentRecipes, setRecentRecipes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    fetchRecentRecipes();
   }, []);
   
   useEffect(() => {
@@ -118,6 +107,57 @@ const Dashboard = () => {
     
     setFilteredRecipes(filtered);
   }, [searchQuery, activeCategory]);
+
+  const fetchRecentRecipes = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Get real recipes from Supabase
+      const { data, error } = await supabase
+        .from('recipes')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Transform to match our component props
+        const formattedRecipes = data.map(recipe => ({
+          id: recipe.id,
+          title: recipe.title,
+          image: recipe.image_url,
+          cookingTime: recipe.cooking_time,
+          calories: recipe.calories,
+          difficulty: recipe.difficulty as 'Easy' | 'Medium' | 'Hard',
+          rating: recipe.rating
+        }));
+        
+        setRecentRecipes(formattedRecipes);
+      } else {
+        // Fallback to mock data if no recipes are found
+        setRecentRecipes(mockRecipes.map(recipe => ({
+          ...recipe,
+          image: recipe.image
+        })));
+      }
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+      toast({
+        title: 'Error fetching recipes',
+        description: 'Unable to load recent recipes.',
+        variant: 'destructive'
+      });
+      
+      // Fallback to mock data
+      setRecentRecipes(mockRecipes.map(recipe => ({
+        ...recipe,
+        image: recipe.image
+      })));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-sustainabite-cream pb-24">
@@ -199,7 +239,7 @@ const Dashboard = () => {
             <Button 
               variant="link" 
               className="text-sustainabite-purple font-medium p-0 text-sm"
-              onClick={() => navigate('/discover')}
+              onClick={() => navigate('/recipes')}
             >
               See all
               <ArrowRight className="ml-1 w-3 h-3" />
@@ -287,7 +327,7 @@ const Dashboard = () => {
           </Tabs>
         </div>
         
-        {/* Recent recipes */}
+        {/* Recent recipes with carousel */}
         <div className="mt-8">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-serif font-medium">Recent recipes</h2>
@@ -301,28 +341,10 @@ const Dashboard = () => {
             </Button>
           </div>
           
-          <div className="grid grid-cols-2 gap-3">
-            {isLoading ? (
-              <>
-                <div className="h-36 rounded-2xl animate-pulse bg-muted"></div>
-                <div className="h-36 rounded-2xl animate-pulse bg-muted"></div>
-              </>
-            ) : (
-              filteredRecipes.slice(2, 4).map(recipe => (
-                <RecipeCard
-                  key={recipe.id}
-                  id={recipe.id}
-                  title={recipe.title}
-                  image={recipe.image}
-                  cookingTime={recipe.cookingTime}
-                  calories={recipe.calories}
-                  difficulty={recipe.difficulty}
-                  rating={recipe.rating}
-                  className="h-full"
-                />
-              ))
-            )}
-          </div>
+          <RecentRecipesCarousel 
+            recipes={recentRecipes} 
+            isLoading={isLoading} 
+          />
         </div>
       </main>
     </div>

@@ -1,128 +1,106 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChefHat, Clock, Bookmark, Filter, Heart, Search, X, TrendingUp } from "lucide-react";
+import { ChefHat, Filter, Heart, Search, X, TrendingUp } from "lucide-react";
 import RecipeCard from "@/components/RecipeCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { searchRecipes, getSavedRecipes } from "@/utils/recipeSearch";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 const cuisineFilters = [
   "Italian", "Asian", "Mexican", "Mediterranean", "Indian", 
   "American", "French", "Middle Eastern", "Thai", "Japanese"
 ];
 
-const popularSearches = [
-  "Healthy dinner", "Quick lunch", "Vegetarian", "High protein", 
-  "Low calorie", "Gluten free", "Mediterranean", "Asian fusion"
-];
-
-const recipeCollection = [
-  {
-    id: "rec1",
-    title: "Mediterranean Chickpea Salad",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    cookingTime: 15,
-    calories: 320,
-    difficulty: "Easy" as const,
-    rating: 4.7
-  },
-  {
-    id: "rec2",
-    title: "Lemon Garlic Butter Shrimp Pasta",
-    image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    cookingTime: 25,
-    calories: 450,
-    difficulty: "Medium" as const,
-    rating: 4.8
-  },
-  {
-    id: "rec3",
-    title: "Spinach & Feta Stuffed Chicken",
-    image: "https://images.unsplash.com/photo-1518492104633-130d5b3143bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1773&q=80",
-    cookingTime: 35,
-    calories: 380,
-    difficulty: "Medium" as const,
-    rating: 4.9
-  },
-  {
-    id: "rec4",
-    title: "Vegetable Buddha Bowl",
-    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1768&q=80",
-    cookingTime: 20,
-    calories: 350,
-    difficulty: "Easy" as const,
-    rating: 4.6
-  },
-  {
-    id: "rec5",
-    title: "Teriyaki Salmon with Rice",
-    image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
-    cookingTime: 30,
-    calories: 420,
-    difficulty: "Medium" as const,
-    rating: 4.8
-  },
-  {
-    id: "rec6",
-    title: "Avocado Toast with Poached Egg",
-    image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1780&q=80",
-    cookingTime: 15,
-    calories: 300,
-    difficulty: "Easy" as const,
-    rating: 4.7
-  }
-];
-
-const trendingRecipes = [
-  {
-    id: "trend1",
-    title: "Avocado & Quinoa Power Bowl",
-    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80",
-    cookingTime: 20,
-    calories: 420,
-    difficulty: "Easy" as const,
-    rating: 4.8
-  },
-  {
-    id: "trend2",
-    title: "Lemon Garlic Salmon",
-    image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    cookingTime: 25,
-    calories: 380,
-    difficulty: "Medium" as const,
-    rating: 4.9
-  },
-  {
-    id: "trend3",
-    title: "Mushroom Risotto",
-    image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    cookingTime: 35,
-    calories: 450,
-    difficulty: "Medium" as const,
-    rating: 4.7
-  },
-  {
-    id: "trend4",
-    title: "Overnight Oats with Berries",
-    image: "https://images.unsplash.com/photo-1493770348161-369560ae357d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    cookingTime: 10,
-    calories: 320,
-    difficulty: "Easy" as const,
-    rating: 4.6
-  }
-];
-
-const savedRecipes = recipeCollection.slice(0, 3);
-const createdRecipes = recipeCollection.slice(3, 5);
-
 const Recipes = () => {
   const [activeTab, setActiveTab] = useState("discover");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [recipes, setRecipes] = useState<any[]>([]);
+  const [savedRecipes, setSavedRecipes] = useState<any[]>([]);
+  const [createdRecipes, setCreatedRecipes] = useState<any[]>([]);
+  const { user } = useAuth();
+  
+  // Refs for swipe functionality
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [startX, setStartX] = useState<number | null>(null);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  
+  useEffect(() => {
+    fetchRecipes();
+    if (user) {
+      fetchSavedRecipes();
+      fetchCreatedRecipes();
+    }
+  }, [user]);
+  
+  useEffect(() => {
+    // Apply search filter when query changes
+    if (searchQuery.length > 0 || selectedCuisine) {
+      fetchRecipes();
+    }
+  }, [searchQuery, selectedCuisine]);
+
+  const fetchRecipes = async () => {
+    try {
+      setIsLoading(true);
+      
+      const { data, count } = await searchRecipes({
+        searchTerm: searchQuery,
+        cuisine: selectedCuisine || undefined,
+        limit: 30
+      });
+      
+      setRecipes(data || []);
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+      toast({
+        title: 'Error fetching recipes',
+        description: 'Unable to load recipes. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const fetchSavedRecipes = async () => {
+    try {
+      if (!user) return;
+      
+      const data = await getSavedRecipes(user.id);
+      setSavedRecipes(data || []);
+    } catch (error) {
+      console.error('Error fetching saved recipes:', error);
+    }
+  };
+  
+  const fetchCreatedRecipes = async () => {
+    try {
+      if (!user) return;
+      
+      const { data, error } = await searchRecipes({
+        searchTerm: '',
+        limit: 10,
+        offset: 0
+      });
+      
+      if (error) throw error;
+      
+      // For now, just show a subset as user's created recipes
+      setCreatedRecipes(data?.slice(0, 3) || []);
+    } catch (error) {
+      console.error('Error fetching created recipes:', error);
+    }
+  };
 
   const addFilter = (filter: string) => {
     if (!activeFilters.includes(filter)) {
@@ -134,6 +112,24 @@ const Recipes = () => {
     setActiveFilters(activeFilters.filter(f => f !== filter));
   };
 
+  const handleCuisineClick = (cuisine: string) => {
+    setSelectedCuisine(selectedCuisine === cuisine ? null : cuisine);
+  };
+  
+  // Touch handlers for cuisine scrolling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!scrollAreaRef.current) return;
+    setStartX(e.touches[0].clientX);
+    setScrollLeft(scrollAreaRef.current.scrollLeft);
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!startX || !scrollAreaRef.current) return;
+    const x = e.touches[0].clientX;
+    const walk = (startX - x) * 2; // Multiply by 2 for faster scrolling
+    scrollAreaRef.current.scrollLeft = scrollLeft + walk;
+  };
+
   return (
     <div className="container max-w-5xl mx-auto px-4 pb-24 pt-6 animate-fade-in">
       <div className="glass-card p-4 mb-6 rounded-2xl">
@@ -142,7 +138,7 @@ const Recipes = () => {
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search for recipes, ingredients, or cuisine..."
+              placeholder="Search recipes..."
               className="pl-9 pr-4 py-2 w-full bg-background/80"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -177,8 +173,13 @@ const Recipes = () => {
         </TabsList>
 
         <div className="mb-6">
-          <ScrollArea className="whitespace-nowrap pb-3">
-            <div className="flex gap-2">
+          <div 
+            ref={scrollAreaRef}
+            className="overflow-x-auto whitespace-nowrap pb-3"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+          >
+            <div className="flex gap-2 p-1">
               {cuisineFilters.map(cuisine => (
                 <Badge 
                   key={cuisine}
@@ -188,33 +189,16 @@ const Recipes = () => {
                       ? "bg-sustainabite-purple text-white" 
                       : "hover:bg-sustainabite-purple/10"
                   }`}
-                  onClick={() => setSelectedCuisine(selectedCuisine === cuisine ? null : cuisine)}
+                  onClick={() => handleCuisineClick(cuisine)}
                 >
                   {cuisine}
                 </Badge>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </div>
 
         <TabsContent value="discover" className="mt-0">
-          {/* Popular Searches Section */}
-          <div className="mb-8">
-            <h2 className="font-serif text-xl font-medium mb-3 text-left">Popular Searches</h2>
-            <div className="flex flex-wrap gap-2">
-              {popularSearches.map(search => (
-                <Button 
-                  key={search} 
-                  variant="outline" 
-                  className="rounded-full text-sm bg-background/80 hover:bg-accent/80"
-                  onClick={() => addFilter(search)}
-                >
-                  {search}
-                </Button>
-              ))}
-            </div>
-          </div>
-
           {/* Trending Now Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
@@ -224,13 +208,31 @@ const Recipes = () => {
                 <span>Most popular this week</span>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {trendingRecipes.map(recipe => (
-                <Link to={`/recipe/${recipe.id}`} key={recipe.id}>
-                  <RecipeCard {...recipe} className="h-full" />
-                </Link>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {recipes.slice(0, 4).map(recipe => (
+                  <Link to={`/recipe/${recipe.id}`} key={recipe.id}>
+                    <RecipeCard 
+                      id={recipe.id}
+                      title={recipe.title}
+                      image={recipe.image_url}
+                      cookingTime={recipe.cooking_time}
+                      calories={recipe.calories}
+                      difficulty={recipe.difficulty}
+                      rating={recipe.rating}
+                      className="h-full" 
+                    />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Quick & Easy Section */}
@@ -238,78 +240,164 @@ const Recipes = () => {
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-serif text-xl font-medium text-left">Quick & Easy</h2>
               <div className="flex items-center text-sm text-sustainabite-purple">
-                <Clock className="w-4 h-4 mr-1" />
+                <Filter className="w-4 h-4 mr-1" />
                 <span>Under 30 minutes</span>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {trendingRecipes.slice(0, 2).map(recipe => (
-                <Link to={`/recipe/${recipe.id}`} key={`quick-${recipe.id}`}>
-                  <RecipeCard {...recipe} className="h-full" />
-                </Link>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
+                <div className="h-56 rounded-2xl animate-pulse bg-muted"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {recipes
+                  .filter(recipe => recipe.cooking_time <= 30)
+                  .slice(0, 2)
+                  .map(recipe => (
+                    <Link to={`/recipe/${recipe.id}`} key={`quick-${recipe.id}`}>
+                      <RecipeCard 
+                        id={recipe.id}
+                        title={recipe.title}
+                        image={recipe.image_url}
+                        cookingTime={recipe.cooking_time}
+                        calories={recipe.calories}
+                        difficulty={recipe.difficulty}
+                        rating={recipe.rating}
+                        className="h-full" 
+                      />
+                    </Link>
+                  ))}
+              </div>
+            )}
           </div>
         </TabsContent>
 
         <TabsContent value="all" className="mt-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recipeCollection.map(recipe => (
-              <Link to={`/recipe/${recipe.id}`} key={recipe.id}>
-                <RecipeCard {...recipe} className="h-full" />
-              </Link>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-sustainabite-purple" />
+            </div>
+          ) : recipes.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recipes.map(recipe => (
+                <Link to={`/recipe/${recipe.id}`} key={recipe.id}>
+                  <RecipeCard 
+                    id={recipe.id}
+                    title={recipe.title}
+                    image={recipe.image_url}
+                    cookingTime={recipe.cooking_time}
+                    calories={recipe.calories}
+                    difficulty={recipe.difficulty}
+                    rating={recipe.rating}
+                    className="h-full" 
+                  />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No recipes found matching your search criteria.</p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="saved" className="mt-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {savedRecipes.map(recipe => (
-              <div key={recipe.id} className="relative">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute top-3 right-3 z-10 bg-black/30 text-white hover:bg-black/50 hover:text-white"
-                >
-                  <Bookmark className="h-4 w-4 fill-current" />
-                </Button>
-                <Link to={`/recipe/${recipe.id}`}>
-                  <RecipeCard {...recipe} className="h-full" />
-                </Link>
-              </div>
-            ))}
-          </div>
+          {!user ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">Please log in to view your saved recipes.</p>
+              <Button asChild>
+                <Link to="/login">Log In</Link>
+              </Button>
+            </div>
+          ) : isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-sustainabite-purple" />
+            </div>
+          ) : savedRecipes.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {savedRecipes.map(recipe => (
+                <div key={recipe.id} className="relative">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-3 right-3 z-10 bg-black/30 text-white hover:bg-black/50 hover:text-white"
+                  >
+                    <Heart className="h-4 w-4 fill-current" />
+                  </Button>
+                  <Link to={`/recipe/${recipe.id}`}>
+                    <RecipeCard 
+                      id={recipe.id}
+                      title={recipe.title}
+                      image={recipe.image_url}
+                      cookingTime={recipe.cooking_time}
+                      calories={recipe.calories}
+                      difficulty={recipe.difficulty}
+                      rating={recipe.rating}
+                      className="h-full" 
+                    />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">You haven't saved any recipes yet.</p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="created" className="mt-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {createdRecipes.map(recipe => (
-              <div key={recipe.id} className="relative">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute top-3 right-3 z-10 bg-black/30 text-white hover:bg-black/50 hover:text-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <Link to={`/recipe/${recipe.id}`}>
-                  <RecipeCard {...recipe} className="h-full" />
-                </Link>
-              </div>
-            ))}
-            <div className="flex items-center justify-center h-full min-h-[300px] rounded-2xl border-2 border-dashed border-muted p-6 text-center">
-              <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
-                  <ChefHat className="h-10 w-10 text-muted-foreground" />
+          {!user ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">Please log in to view your created recipes.</p>
+              <Button asChild>
+                <Link to="/login">Log In</Link>
+              </Button>
+            </div>
+          ) : isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-sustainabite-purple" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {createdRecipes.map(recipe => (
+                <div key={recipe.id} className="relative">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-3 right-3 z-10 bg-black/30 text-white hover:bg-black/50 hover:text-white"
+                  >
+                    <Heart className="h-4 w-4" />
+                  </Button>
+                  <Link to={`/recipe/${recipe.id}`}>
+                    <RecipeCard 
+                      id={recipe.id}
+                      title={recipe.title}
+                      image={recipe.image_url}
+                      cookingTime={recipe.cooking_time}
+                      calories={recipe.calories}
+                      difficulty={recipe.difficulty}
+                      rating={recipe.rating}
+                      className="h-full" 
+                    />
+                  </Link>
                 </div>
-                <h3 className="mt-4 text-lg font-medium">Create a recipe</h3>
-                <p className="mb-4 mt-2 text-sm text-muted-foreground">
-                  Share your culinary creations with the community
-                </p>
-                <Button className="mt-2">Create Recipe</Button>
+              ))}
+              <div className="flex items-center justify-center h-full min-h-[300px] rounded-2xl border-2 border-dashed border-muted p-6 text-center">
+                <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-4">
+                    <ChefHat className="h-10 w-10 text-muted-foreground" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-medium">Create a recipe</h3>
+                  <p className="mb-4 mt-2 text-sm text-muted-foreground">
+                    Share your culinary creations with the community
+                  </p>
+                  <Button className="mt-2">Create Recipe</Button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
