@@ -63,16 +63,16 @@ const CommentSection = ({ postId, onCommentAdded }: CommentSectionProps) => {
       
       // Transform comments to add like information
       const commentsWithLikes = await Promise.all((commentsData || []).map(async (comment) => {
-        // Get like count by direct count query
-        const { count: likesCount, error: countError } = await supabase
+        // Get like count
+        const { count: likesCount } = await supabase
           .from('comment_likes')
-          .select('*', { count: 'exact', head: true })
+          .select('id', { count: 'exact' })
           .eq('comment_id', comment.id);
           
         // Check if user has liked the comment
         let likedByUser = false;
         if (user) {
-          const { data: likeData, error: likeError } = await supabase
+          const { data: likeData } = await supabase
             .from('comment_likes')
             .select('id')
             .eq('comment_id', comment.id)
@@ -87,7 +87,7 @@ const CommentSection = ({ postId, onCommentAdded }: CommentSectionProps) => {
           content: comment.content,
           created_at: comment.created_at,
           user: comment.profiles,
-          likes_count: likesCount || 0,
+          likes_count: likesCount,
           liked_by_user: likedByUser
         };
       }));
@@ -158,30 +158,26 @@ const CommentSection = ({ postId, onCommentAdded }: CommentSectionProps) => {
     
     try {
       if (currentlyLiked) {
-        // Unlike comment using a raw delete query
-        const { error } = await supabase
+        // Unlike comment
+        await supabase
           .from('comment_likes')
           .delete()
           .eq('comment_id', commentId)
           .eq('user_id', user.id);
         
-        if (error) throw error;
-        
         setComments(comments.map(comment => 
           comment.id === commentId 
-            ? { ...comment, liked_by_user: false, likes_count: Math.max(0, comment.likes_count - 1) }
+            ? { ...comment, liked_by_user: false, likes_count: comment.likes_count - 1 }
             : comment
         ));
       } else {
-        // Like comment using a raw insert query
-        const { error } = await supabase
+        // Like comment
+        await supabase
           .from('comment_likes')
           .insert({
             comment_id: commentId,
             user_id: user.id
           });
-        
-        if (error) throw error;
         
         setComments(comments.map(comment => 
           comment.id === commentId 

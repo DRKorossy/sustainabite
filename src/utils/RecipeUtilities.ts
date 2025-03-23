@@ -63,7 +63,7 @@ export async function addRecipeIngredientsToCart(recipeId: string, userId: strin
       throw new Error('Recipe or ingredients not found');
     }
     
-    // Calculate serving ratio - use a default of 4 if servings is undefined
+    // Calculate serving ratio - use a default of 1 if servings is undefined
     const recipeServings = recipe.servings || 4; // Default to 4 if not specified
     const servingRatio = servings / recipeServings;
     

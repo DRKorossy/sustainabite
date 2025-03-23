@@ -94,11 +94,8 @@ const GoalsPage = () => {
       
       if (error) throw error;
       
-      if (data && data.goals) {
+      if (data?.goals) {
         setSelectedGoals(data.goals);
-      } else {
-        // If goals is null or empty array, initialize with empty array
-        setSelectedGoals([]);
       }
     } catch (error) {
       console.error('Error fetching user goals:', error);
@@ -107,8 +104,6 @@ const GoalsPage = () => {
         description: 'Unable to load your nutritional goals.',
         variant: 'destructive'
       });
-      // Initialize with empty array on error
-      setSelectedGoals([]);
     } finally {
       setLoading(false);
     }
