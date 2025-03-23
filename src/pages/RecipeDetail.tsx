@@ -20,6 +20,7 @@ import { toast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { adjustIngredientQuantities, addRecipeIngredientsToCart } from '@/utils/RecipeUtilities';
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -67,6 +68,11 @@ const RecipeDetail = () => {
       if (error) throw error;
       
       if (data) {
+        // Initialize reviews array if it doesn't exist
+        if (!data.reviews) {
+          data.reviews = [];
+        }
+        
         setRecipe(data);
         // Default to 2 servings if not specified
         setOriginalServings(data.servings || 2);
@@ -194,21 +200,20 @@ const RecipeDetail = () => {
     }
     
     try {
-      // First, get matching grocery items for these ingredients
-      const ingredientNames = adjustedIngredients.map(ing => {
-        // Extract just the item name, removing quantities and units
-        const nameMatch = ing.match(/(?:\d+\s*\w*\s*)(.*)/);
-        return nameMatch ? nameMatch[1].trim() : ing;
-      });
+      // Call the utility function to add ingredients to cart
+      const result = await addRecipeIngredientsToCart(recipe.id, user.id, servings);
       
-      // Add ingredients to cart
-      toast({
-        title: "Added to shopping cart",
-        description: `Ingredients for ${recipe.title} have been added to your cart.`,
-      });
-      
-      // Navigate to cart
-      navigate('/cart');
+      if (result.success) {
+        toast({
+          title: "Added to shopping cart",
+          description: `Ingredients for ${recipe.title} have been added to your cart.`,
+        });
+        
+        // Navigate to cart
+        navigate('/cart');
+      } else {
+        throw new Error('Failed to add ingredients to cart');
+      }
     } catch (error) {
       console.error('Error adding to cart:', error);
       toast({
@@ -460,37 +465,43 @@ const RecipeDetail = () => {
                 variant="link" 
                 className="text-sustainabite-purple font-medium p-0"
               >
-                See all ({recipe.reviews.length})
+                See all ({recipe.reviews?.length || 0})
               </Button>
             </div>
             
             <div className="space-y-4">
-              {recipe.reviews.slice(0, 2).map(review => (
-                <div key={review.id} className="glass-card rounded-xl p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <img 
-                      src={review.avatar} 
-                      alt={review.user} 
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div>
-                      <div className="font-medium">{review.user}</div>
-                      <div className="flex items-center">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star 
-                            key={i}
-                            className={cn(
-                              "w-3 h-3", 
-                              i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-muted"
-                            )}
-                          />
-                        ))}
+              {recipe.reviews && recipe.reviews.length > 0 ? 
+                recipe.reviews.slice(0, 2).map((review: any) => (
+                  <div key={review.id} className="glass-card rounded-xl p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <img 
+                        src={review.avatar || '/placeholder.svg'} 
+                        alt={review.user || 'User'} 
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                      <div>
+                        <div className="font-medium">{review.user || 'Anonymous'}</div>
+                        <div className="flex items-center">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star 
+                              key={i}
+                              className={cn(
+                                "w-3 h-3", 
+                                i < (review.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-muted"
+                              )}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
+                    <p className="text-sm text-muted-foreground">{review.comment || 'No comment'}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground">{review.comment}</p>
+                ))
+                :
+                <div className="glass-card rounded-xl p-4 text-center text-muted-foreground">
+                  No reviews yet. Be the first to review this recipe!
                 </div>
-              ))}
+              }
             </div>
             
             <Button 
@@ -508,4 +519,3 @@ const RecipeDetail = () => {
 };
 
 export default RecipeDetail;
-

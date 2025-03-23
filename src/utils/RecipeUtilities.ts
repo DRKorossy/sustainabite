@@ -63,8 +63,9 @@ export async function addRecipeIngredientsToCart(recipeId: string, userId: strin
       throw new Error('Recipe or ingredients not found');
     }
     
-    // Calculate serving ratio
-    const servingRatio = servings / (recipe.servings || 1);
+    // Calculate serving ratio - use a default of 1 if servings is undefined
+    const recipeServings = recipe.servings || 4; // Default to 4 if not specified
+    const servingRatio = servings / recipeServings;
     
     // Process ingredients to extract names and quantities
     const cartItems = recipe.ingredients.map((ingredient: string) => {
@@ -82,17 +83,52 @@ export async function addRecipeIngredientsToCart(recipeId: string, userId: strin
       };
     });
     
-    // Add ingredients to cart (simplified example)
-    // In a real app, you might want to:
-    // 1. Check if items already exist in cart and update quantities
-    // 2. Match ingredients to actual grocery items in your database
-    // 3. Handle units and conversions more carefully
+    // Add ingredients to cart
+    for (const item of cartItems) {
+      const { error } = await supabase
+        .from('shopping_cart')
+        .insert({
+          user_id: userId,
+          grocery_item_id: await getOrCreateGroceryItem(item.name),
+          quantity: item.quantity
+        });
+      
+      if (error) throw error;
+    }
     
     return { success: true, cartItems };
   } catch (error) {
     console.error('Error adding recipe ingredients to cart:', error);
     return { success: false, error };
   }
+}
+
+// Helper function to get or create grocery item
+async function getOrCreateGroceryItem(name: string) {
+  // First, try to find an existing item
+  const { data: existingItem } = await supabase
+    .from('grocery_items')
+    .select('id')
+    .ilike('name', name)
+    .maybeSingle();
+  
+  if (existingItem) {
+    return existingItem.id;
+  }
+  
+  // If not found, create a new one
+  const { data: newItem, error } = await supabase
+    .from('grocery_items')
+    .insert({
+      name,
+      category: 'Other', // Default category
+      is_perishable: true // Default value
+    })
+    .select('id')
+    .single();
+  
+  if (error) throw error;
+  return newItem.id;
 }
 
 // Function to rate a recipe
