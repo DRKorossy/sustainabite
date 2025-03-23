@@ -7,7 +7,7 @@ import {
   ShoppingCart, 
   User, 
   Carrot,
-  Camera
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -41,6 +41,7 @@ const Navbar = () => {
     { name: 'Home', path: '/dashboard', icon: <Home className="w-5 h-5" /> },
     { name: 'Recipes', path: '/recipes', icon: <ChefHat className="w-5 h-5" /> },
     { name: 'Groceries', path: '/my-groceries', icon: <Carrot className="w-5 h-5" /> },
+    { name: 'Social', path: '/social', icon: <Users className="w-5 h-5" /> },
     { name: 'Cart', path: '/cart', icon: <ShoppingCart className="w-5 h-5" /> },
     { name: 'Profile', path: '/profile', icon: <User className="w-5 h-5" /> },
   ];
