@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -22,13 +23,37 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { adjustIngredientQuantities, addRecipeIngredientsToCart } from '@/utils/RecipeUtilities';
 
+interface Review {
+  id: string;
+  user: string;
+  avatar?: string;
+  rating: number;
+  comment?: string;
+}
+
+interface Recipe {
+  id: string;
+  title: string;
+  description?: string;
+  image_url?: string;
+  cooking_time: number;
+  calories: number;
+  difficulty: string;
+  rating?: number;
+  ingredients: string[];
+  instructions: string[];
+  servings: number;
+  reviews?: Review[];
+  nutrition_facts?: Record<string, string>;
+}
+
 const RecipeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [recipe, setRecipe] = useState<any | null>(null);
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [servings, setServings] = useState(1);
   const [originalServings, setOriginalServings] = useState(1);
   const [adjustedIngredients, setAdjustedIngredients] = useState<string[]>([]);
@@ -68,15 +93,16 @@ const RecipeDetail = () => {
       if (error) throw error;
       
       if (data) {
-        // Initialize reviews array if it doesn't exist
-        if (!data.reviews) {
-          data.reviews = [];
-        }
+        // Ensure the recipe has all required properties
+        const recipeWithDefaults: Recipe = {
+          ...data,
+          reviews: data.reviews || [],
+          servings: data.servings || 4
+        };
         
-        setRecipe(data);
-        // Default to 2 servings if not specified
-        setOriginalServings(data.servings || 2);
-        setServings(data.servings || 2);
+        setRecipe(recipeWithDefaults);
+        setOriginalServings(recipeWithDefaults.servings);
+        setServings(recipeWithDefaults.servings);
       } else {
         console.error(`Recipe with ID ${recipeId} not found`);
         toast({
@@ -471,7 +497,7 @@ const RecipeDetail = () => {
             
             <div className="space-y-4">
               {recipe.reviews && recipe.reviews.length > 0 ? 
-                recipe.reviews.slice(0, 2).map((review: any) => (
+                recipe.reviews.slice(0, 2).map((review: Review) => (
                   <div key={review.id} className="glass-card rounded-xl p-4">
                     <div className="flex items-center gap-3 mb-2">
                       <img 

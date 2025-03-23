@@ -33,6 +33,35 @@ export type Database = {
         }
         Relationships: []
       }
+      comment_likes: {
+        Row: {
+          comment_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_likes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           content: string
@@ -324,6 +353,7 @@ export type Database = {
           created_at: string | null
           dietary_restrictions: string[] | null
           full_name: string | null
+          goals: string[] | null
           id: string
           updated_at: string | null
           username: string | null
@@ -337,6 +367,7 @@ export type Database = {
           created_at?: string | null
           dietary_restrictions?: string[] | null
           full_name?: string | null
+          goals?: string[] | null
           id: string
           updated_at?: string | null
           username?: string | null
@@ -350,6 +381,7 @@ export type Database = {
           created_at?: string | null
           dietary_restrictions?: string[] | null
           full_name?: string | null
+          goals?: string[] | null
           id?: string
           updated_at?: string | null
           username?: string | null
@@ -414,6 +446,7 @@ export type Database = {
           instructions: string[]
           rating: number | null
           ratings_count: number | null
+          servings: number
           title: string
           updated_at: string | null
         }
@@ -432,6 +465,7 @@ export type Database = {
           instructions: string[]
           rating?: number | null
           ratings_count?: number | null
+          servings?: number
           title: string
           updated_at?: string | null
         }
@@ -450,6 +484,7 @@ export type Database = {
           instructions?: string[]
           rating?: number | null
           ratings_count?: number | null
+          servings?: number
           title?: string
           updated_at?: string | null
         }

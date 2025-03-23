@@ -11,6 +11,7 @@ interface AuthContextProps {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string, userData?: any) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  signOut: () => Promise<void>; // Adding signOut as an alias to logout
   refreshUser: () => Promise<void>;
 }
 
@@ -132,7 +133,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, login, register, logout, refreshUser }}
+      value={{ 
+        user, 
+        session, 
+        loading, 
+        login, 
+        register, 
+        logout, 
+        signOut: logout, // Add signOut as an alias to logout
+        refreshUser 
+      }}
     >
       {children}
     </AuthContext.Provider>
